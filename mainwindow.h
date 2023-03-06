@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "sphere.h"
+
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
@@ -14,6 +16,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+signals:
+    void sendDataToGLWidget(Sphere sphere);
+
+public slots:
+    void drawSphere(Sphere sphere);
 
 private slots:
     void on_actionDrawSphere_triggered();

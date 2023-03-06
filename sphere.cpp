@@ -1,5 +1,7 @@
 #define _USE_MATH_DEFINES
+
 #include "sphere.h"
+
 #include <cmath>
 
 Sphere::Sphere():
