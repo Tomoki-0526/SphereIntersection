@@ -9,8 +9,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    connect(this, SIGNAL(sendDataToGLWidget(Sphere)), ui->openGLWidget, SLOT(drawSphere(Sphere)));
 }
 
 MainWindow::~MainWindow()
@@ -26,7 +24,7 @@ void MainWindow::drawSphere(Sphere sphere)
 void MainWindow::on_actionDrawSphere_triggered()
 {
     ParamInputDialog* dlg = new ParamInputDialog(this);
-    connect(dlg, SIGNAL(sendDataToMainWindow(Sphere)), this, SLOT(drawSphere(Sphere)));
+
     dlg->setWindowTitle(QStringLiteral("输入球参数（球心坐标&半径）"));
     dlg->exec();
     delete dlg;

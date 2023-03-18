@@ -1,8 +1,6 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
-#include "sphere.h"
-
 #include <QOpenGLWidget>
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
@@ -10,8 +8,15 @@
 #include <QOpenGLVertexArrayObject>
 
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <QVector3D>
 #include <QMatrix4x4>
+#include <QTimer>
+#include <QPoint>
+
+#include <vector>
+
+using namespace std;
 
 class GLWidget : public QOpenGLWidget, public QOpenGLExtraFunctions
 {
@@ -26,35 +31,45 @@ protected:
     virtual void resizeGL(int w, int h) override;
     virtual void paintGL() override;
 
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseMoveEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
+    // 鼠标事件
+    virtual void mousePressEvent(QMouseEvent* event) override;
+    virtual void mouseMoveEvent(QMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QMouseEvent* event) override;
+    virtual void wheelEvent(QWheelEvent* event) override;
 
-    void initCoordinate();
-
-private slots:
-    void drawSphere(Sphere sphere);
+    // 绘制
+    void drawSphere(GLfloat x, GLfloat y, GLfloat z, GLfloat r, GLint M = 100, GLint N = 100);
 
 private:
-    // 相机参数
+    // 相机
     QVector3D cam_pos;
     QVector3D cam_front;
     QVector3D cam_up;
     QMatrix4x4 cam_proj_mat;
     QMatrix4x4 cam_view_mat;
-    float cam_view_size;
+    float view_size;
+
+    // 鼠标控制
+    bool rotate_with_center;
+    bool rotate_flag;
+    bool move_flag;
+    float yaw;      // y轴转角
+    float pitch;    // x轴转角
+    QPoint last_mouse_pos;
+
+    // 光照
 
     // 着色器
-    QOpenGLShaderProgram* program;
-    GLint col_attr = 0;
-    GLint use_nor = 0;
-    GLint proj_mat = 0;
-    GLint view_mat = 0;
+    QOpenGLShaderProgram* shader_program;
 
-    // 缓冲区
     QOpenGLBuffer* vbo;
     QOpenGLVertexArrayObject* vao;
     QOpenGLBuffer* vno;
+
+    GLint col_attr = 0;
+    GLint use_nor = 0;
+    GLint projection_matrix = 0;
+    GLint view_matrix = 0;
 };
 
 #endif // GLWIDGET_H

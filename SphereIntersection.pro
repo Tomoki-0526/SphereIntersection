@@ -13,23 +13,21 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     paraminputdialog.cpp \
-    point2d.cpp \
-    point3d.cpp \
-    shader.cpp \
     sphere.cpp
 
 HEADERS += \
     glwidget.h \
     mainwindow.h \
     paraminputdialog.h \
-    point2d.h \
-    point3d.h \
-    shader.h \
     sphere.h
 
 FORMS += \
     mainwindow.ui \
     paraminputdialog.ui
+
+LIBS += \
+    -lOpenGL32 \
+    -lGlU32
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -37,5 +35,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    shader/shader.frag \
-    shader/shader.vert
+    shader/triangle.frag \
+    shader/triangle.vert
