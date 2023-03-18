@@ -4,21 +4,21 @@
 
 #include <cmath>
 
-Sphere::Sphere():
-    _c(Point3D(0, 0, 0)),
-    _r(0)
+Sphere::Sphere()
+    : _c(QVector3D(0, 0, 0))
+    , _r(0)
 {
 }
 
-Sphere::Sphere(const Point3D& c, const double r):
-    _c(c),
-    _r(r)
+Sphere::Sphere(const QVector3D& c, const float r)
+    : _c(c)
+    , _r(r)
 {
 }
 
-Sphere::Sphere(const double x, const double y, const double z, const double r):
-    _c(Point3D(x, y, z)),
-    _r(r)
+Sphere::Sphere(const float x, const float y, const float z, const float r)
+    : _c(QVector3D(x, y, z))
+    , _r(r)
 {
 }
 
@@ -26,39 +26,39 @@ Sphere::~Sphere()
 {
 }
 
-Point3D Sphere::center() const
+QVector3D Sphere::center() const
 {
     return _c;
 }
 
-double Sphere::radius() const
+float Sphere::radius() const
 {
     return _r;
 }
 
-void Sphere::setCenter(const Point3D& c)
+void Sphere::center(const QVector3D& c)
 {
     _c.setX(c.x());
     _c.setY(c.y());
     _c.setZ(c.z());
 }
 
-void Sphere::setCenter(const double x, const double y, const double z)
+void Sphere::center(const float x, const float y, const float z)
 {
     _c.setX(x);
     _c.setY(y);
     _c.setZ(z);
 }
 
-void Sphere::setRadius(const double r)
+void Sphere::radius(const float r)
 {
     _r = r;
 }
 
-Point2D Sphere::getUV(const Point3D& p)
+QVector2D Sphere::getUV(const QVector3D& p)
 {
-    double u = atan2(p.y(), p.x()) + M_PI;
-    double v = asin(p.z() / _r);
+    float u = atan2(p.y(), p.x()) + M_PI;
+    float v = asin(p.z() / _r);
 
-    return Point2D(u, v);
+    return QVector2D(u, v);
 }
