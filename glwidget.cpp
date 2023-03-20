@@ -7,21 +7,37 @@
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget{parent}
+    , cam_pos(QVector3D(0.0, 0.0, 1.0))
+    , cam_front(QVector3D(0.0, 0.0, -1.0))
+    , cam_up(QVector3D(0.0, 1.0, 0.0))
+    , view_size(20.0f)
+    , rotate_with_center(true)
+    , rotate_flag(false)
+    , move_flag(false)
+    , yaw(-90.0f)
+    , pitch(0.0f)
 {
-    cam_pos = QVector3D(0.0, 0.0, 1.0);
-    cam_front = QVector3D(0.0, 0.0, -1.0);
-    cam_up = QVector3D(0.0, 1.0, 0.0);
-
     setMouseTracking(true);
-    view_size = 20.0f;
-
-    rotate_with_center = true;
-    rotate_flag = false;
-    move_flag = false;
 }
 
 GLWidget::~GLWidget()
 {
+    if (shader_program) {
+        delete shader_program;
+        shader_program = nullptr;
+    }
+    if (vao) {
+        delete vao;
+        vao = nullptr;
+    }
+    if (vbo) {
+        delete vbo;
+        vbo = nullptr;
+    }
+    if (vno) {
+        delete vno;
+        vno = nullptr;
+    }
 }
 
 void GLWidget::initializeGL()
@@ -92,6 +108,10 @@ void GLWidget::paintGL()
     shader_program->setUniformValue(view_matrix, cam_view_mat);
 
     // TODO: 绘制
+    glLoadIdentity();
+    glPushMatrix();
+    drawSphere(4, 0, 0, 5);
+    glPopMatrix();
 
     vao->release();
     shader_program->release();
@@ -105,7 +125,7 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
         last_mouse_pos = event->pos();
     }
     // 右键旋转视角
-    if (event->button() == Qt::RightButton) {
+    else if (event->button() == Qt::RightButton) {
         rotate_flag = true;
         last_mouse_pos = event->pos();
     }
@@ -135,8 +155,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
         pitch = pitch > 89.0f ? 89.0f : pitch;
         pitch = pitch < -89.0f ? -89.0f : pitch;
 
-        float yaw_r = yaw * (3.14159f / 180);
-        float pitch_r = pitch * (3.14159f / 180);
+        float yaw_r = yaw * (M_PI / 180);
+        float pitch_r = pitch * (M_PI / 180);
 
         if (rotate_with_center) {
             QVector3D center = cam_pos + cam_front * 3;
@@ -168,7 +188,6 @@ void GLWidget::mouseReleaseEvent(QMouseEvent* event)
     if (move_flag) {
         move_flag = false;
     }
-
     // 旋转
     if (rotate_flag) {
         rotate_flag = false;

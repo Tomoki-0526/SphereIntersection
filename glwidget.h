@@ -53,11 +53,12 @@ private:
     bool rotate_with_center;
     bool rotate_flag;
     bool move_flag;
-    float yaw;      // y轴转角
-    float pitch;    // x轴转角
+    float yaw;
+    float pitch;
     QPoint last_mouse_pos;
 
     // 光照
+
 
     // 着色器
     QOpenGLShaderProgram* shader_program;

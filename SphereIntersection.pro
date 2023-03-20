@@ -36,4 +36,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     shader/triangle.frag \
-    shader/triangle.vert
+    shader/triangle.vert \
+    shader/v1.frag \
+    shader/v1.vert
