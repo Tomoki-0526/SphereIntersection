@@ -1,6 +1,8 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include "sphere.h"
+
 #include <QOpenGLWidget>
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
@@ -38,7 +40,10 @@ protected:
     virtual void wheelEvent(QWheelEvent* event) override;
 
     // 绘制
-    void drawSphere(GLfloat x, GLfloat y, GLfloat z, GLfloat r, GLint M = 100, GLint N = 100);
+    void draw(GLenum draw_mode, int num, GLfloat* vertices, GLfloat* colors, GLfloat* normals);
+
+public slots:
+    void addDrawTask(Sphere sphere);
 
 private:
     // 相机
@@ -58,7 +63,6 @@ private:
     QPoint last_mouse_pos;
 
     // 光照
-
 
     // 着色器
     QOpenGLShaderProgram* shader_program;

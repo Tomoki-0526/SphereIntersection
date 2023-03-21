@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    connect(this, SIGNAL(sendDataToGLWidget(Sphere)), ui->openGLWidget, SLOT(addDrawTask(Sphere)));
 }
 
 MainWindow::~MainWindow()
@@ -16,7 +18,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::drawSphere(Sphere sphere)
+void MainWindow::drawSphereByGLWidget(Sphere sphere)
 {
     emit sendDataToGLWidget(sphere);
 }

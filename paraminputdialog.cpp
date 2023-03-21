@@ -7,6 +7,8 @@ ParamInputDialog::ParamInputDialog(QWidget *parent) :
     ui(new Ui::ParamInputDialog)
 {
     ui->setupUi(this);
+
+    connect(this, SIGNAL(sendDataToMainWindow(Sphere)), parent, SLOT(drawSphereByGLWidget(Sphere)));
 }
 
 ParamInputDialog::~ParamInputDialog()

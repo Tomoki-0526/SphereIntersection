@@ -1,4 +1,5 @@
 #include "glwidget.h"
+#include "drawtaskmanager.h"
 
 #include <cmath>
 
@@ -107,11 +108,14 @@ void GLWidget::paintGL()
     shader_program->setUniformValue(projection_matrix, cam_proj_mat);
     shader_program->setUniformValue(view_matrix, cam_view_mat);
 
-    // TODO: 绘制
-    glLoadIdentity();
-    glPushMatrix();
-    drawSphere(4, 0, 0, 5);
-    glPopMatrix();
+//    glLoadIdentity();
+//    glPushMatrix();
+//    drawSphere(4, 0, 0, 5);
+//    glPopMatrix();
+    vector<DrawTask> draw_tasks = DrawTaskManager::getDrawTasks();
+    for (auto& task : draw_tasks) {
+        draw(task.getDrawMode(), task.getNum(), task.getVertices(), task.getColors(), task.getNormals());
+    }
 
     vao->release();
     shader_program->release();
@@ -208,46 +212,56 @@ void GLWidget::wheelEvent(QWheelEvent* event)
     update();
 }
 
-void GLWidget::drawSphere(GLfloat x, GLfloat y, GLfloat z, GLfloat r, GLint M, GLint N)
+void GLWidget::draw(GLenum draw_mode, int num, GLfloat* vertices, GLfloat* colors, GLfloat* normals)
 {
-    float step_z = M_PI / M;
-    float step_xy = 2 * M_PI / N;
-    float xx[4], yy[4], zz[4];
-
-    float angle_z = 0.0;
-    float angle_xy = 0.0;
-    int i = 0, j = 0;
-    glBegin(GL_QUADS);
-    for(i = 0; i < M; i++)
-    {
-        angle_z = i * step_z;
-
-        for(j = 0; j < N; j++)
-        {
-            angle_xy = j * step_xy;
-
-            xx[0] = r * sin(angle_z) * cos(angle_xy);
-            yy[0] = r * sin(angle_z) * sin(angle_xy);
-            zz[0] = r * cos(angle_z);
-
-            xx[1] = r * sin(angle_z + step_z) * cos(angle_xy);
-            yy[1] = r * sin(angle_z + step_z) * sin(angle_xy);
-            zz[1] = r * cos(angle_z + step_z);
-
-            xx[2] = r * sin(angle_z + step_z) * cos(angle_xy + step_xy);
-            yy[2] = r * sin(angle_z + step_z) * sin(angle_xy + step_xy);
-            zz[2] = r * cos(angle_z + step_z);
-
-            xx[3] = r * sin(angle_z) * cos(angle_xy + step_xy);
-            yy[3] = r * sin(angle_z) * sin(angle_xy + step_xy);
-            zz[3] = r * cos(angle_z);
-
-            for(int k = 0; k < 4; k++)
-            {
-                glColor3f(0.30f, 0.66f, 0.26f);
-                glVertex3f(x + xx[k], y + yy[k], z + zz[k]);
-            }
-        }
+    if (colors) {
+        shader_program->setUniformValue(col_attr, QVector4D(colors[0], colors[1], colors[2], 0.5));
     }
-    glEnd();
+    else {
+        GLfloat* color = new GLfloat[4];
+        for (int i = 0; i < 4; ++i) {
+            color[i] = 0.2f;
+        }
+        shader_program->setUniformValue(col_attr, QVector4D(color[0], color[1], color[2], 0.5));
+        delete[] color;
+        color = nullptr;
+    }
+
+    vao->bind();
+    if (normals) {
+        vbo->bind();
+        vbo->allocate(vertices, num * 3 * sizeof(GLfloat));
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+
+        shader_program->setUniformValue(use_nor, true);
+
+        vno->bind();
+        vno->allocate(normals, num * 3 * sizeof(GLfloat));
+
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    }
+    else {
+        vbo->bind();
+        vbo->allocate(vertices, num * 3 * sizeof(GLfloat));
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    }
+
+    glDrawArrays(draw_mode, 0, num);
+
+    if (normals) {
+        shader_program->setUniformValue(use_nor, false);
+        vno->release();
+    }
+    vbo->release();
+    vao->release();
+}
+
+void GLWidget::addDrawTask(Sphere sphere)
+{
+    // TODO: 创建球面mesh
 }

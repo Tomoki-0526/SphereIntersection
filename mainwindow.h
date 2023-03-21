@@ -21,7 +21,7 @@ signals:
     void sendDataToGLWidget(Sphere sphere);
 
 public slots:
-    void drawSphere(Sphere sphere);
+    void drawSphereByGLWidget(Sphere sphere);
 
 private slots:
     void on_actionDrawSphere_triggered();
