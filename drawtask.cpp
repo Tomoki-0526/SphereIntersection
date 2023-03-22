@@ -28,8 +28,8 @@ DrawTask::DrawTask(GLenum draw_mode, int num, GLfloat* vertices, GLfloat* colors
     }
 
     if (colors) {
-        m_colors = new GLfloat[num * 4];
-        for (int i = 0; i < num * 4; ++i) {
+        m_colors = new GLfloat[4];
+        for (int i = 0; i < 4; ++i) {
             m_colors[i] = colors[i];
         }
     }
@@ -50,18 +50,7 @@ DrawTask::DrawTask(GLenum draw_mode, int num, GLfloat* vertices, GLfloat* colors
 
 DrawTask::~DrawTask()
 {
-    if (m_vertices) {
-        delete[] m_vertices;
-        m_vertices = nullptr;
-    }
-    if (m_colors) {
-        delete[] m_colors;
-        m_colors = nullptr;
-    }
-    if (m_normals) {
-        delete[] m_normals;
-        m_normals = nullptr;
-    }
+
 }
 
 GLenum DrawTask::getDrawMode() const

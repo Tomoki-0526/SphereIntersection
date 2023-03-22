@@ -263,5 +263,145 @@ void GLWidget::draw(GLenum draw_mode, int num, GLfloat* vertices, GLfloat* color
 
 void GLWidget::addDrawTask(Sphere sphere)
 {
-    // TODO: 创建球面mesh
+    QVector3D center = sphere.center();
+    float radius = sphere.radius();
+    int resolution = 100;
+
+    int num_vert = resolution * resolution;
+    float* vert = new float[num_vert * 3];
+    float* nor = new float[num_vert * 3];
+
+    for (int col = 0; col < resolution; col++) {
+        for (int row = 0; row < resolution; row++) {
+            QMatrix4x4 rot_mat;
+            rot_mat.rotate(float(col) / resolution * 360, QVector3D(0.0, 0.0, 1.0));
+            rot_mat.rotate(float(row) / resolution * 360, QVector3D(0.0, 1.0, 0.0));
+            QVector3D ret = rot_mat.map(QVector3D(1.0, 0.0, 0.0)).normalized();
+            vert[(col * resolution + row) * 3] = center.x() + ret.x() * radius;
+            vert[(col * resolution + row) * 3 + 1] = center.y() + ret.y() * radius;
+            vert[(col * resolution + row) * 3 + 2] = center.z() + ret.z() * radius;
+
+            nor[(col * resolution + row) * 3] = ret.x();
+            nor[(col * resolution + row) * 3 + 1] = ret.y();
+            nor[(col * resolution + row) * 3 + 2] = ret.z();
+        }
+    }
+
+    int num_tri = 2 * resolution * resolution;
+
+    int num_indices = num_tri * 3;
+    float* vertices = new float[num_indices * 3];
+    int* indices = new int[num_indices];
+
+    float* normals = new float[num_indices * 3];
+
+    for (int col = 0; col < resolution - 1; col++) {
+        for (int row = 0; row < resolution - 1; row++) {
+            indices[(col * resolution + row) * 6] = col * resolution + row;
+            indices[(col * resolution + row) * 6 + 1] = col * resolution + row + 1;
+            indices[(col * resolution + row) * 6 + 2] = col * resolution + row + resolution;
+            indices[(col * resolution + row) * 6 + 3] = col * resolution + row + 1;
+            indices[(col * resolution + row) * 6 + 4] = col * resolution + row + resolution + 1;
+            indices[(col * resolution + row) * 6 + 5] = col * resolution + row + resolution;
+
+            for (int k = 0; k < 3; k++) {
+                vertices[((col * resolution + row) * 6) * 3 + k] = vert[(col * resolution + row) * 3 + k];
+                vertices[((col * resolution + row) * 6 + 1) * 3 + k] = vert[(col * resolution + row + 1) * 3 + k];
+                vertices[((col * resolution + row) * 6 + 2) * 3 + k] = vert[(col * resolution + row + resolution) * 3 + k];
+                vertices[((col * resolution + row) * 6 + 3) * 3 + k] = vert[(col * resolution + row + 1) * 3 + k];
+                vertices[((col * resolution + row) * 6 + 4) * 3 + k] = vert[(col * resolution + row + resolution + 1) * 3 + k];
+                vertices[((col * resolution + row) * 6 + 5) * 3 + k] = vert[(col * resolution + row + resolution) * 3 + k];
+
+                normals[((col * resolution + row) * 6) * 3 + k] = nor[(col * resolution + row) * 3 + k];
+                normals[((col * resolution + row) * 6 + 1) * 3 + k] = nor[(col * resolution + row + 1) * 3 + k];
+                normals[((col * resolution + row) * 6 + 2) * 3 + k] = nor[(col * resolution + row + resolution) * 3 + k];
+                normals[((col * resolution + row) * 6 + 3) * 3 + k] = nor[(col * resolution + row + 1) * 3 + k];
+                normals[((col * resolution + row) * 6 + 4) * 3 + k] = nor[(col * resolution + row + resolution + 1) * 3 + k];
+                normals[((col * resolution + row) * 6 + 5) * 3 + k] = nor[(col * resolution + row + resolution) * 3 + k];
+            }
+        }
+    }
+
+    for (int col = 0; col < resolution - 1; col++) {
+        indices[(col * resolution + resolution - 1) * 6] = col * resolution + resolution - 1;
+        indices[(col * resolution + resolution - 1) * 6 + 1] = col * resolution;
+        indices[(col * resolution + resolution - 1) * 6 + 2] = col * resolution + resolution - 1 + resolution;
+
+        indices[(col * resolution + resolution - 1) * 6 + 3] = col * resolution;
+        indices[(col * resolution + resolution - 1) * 6 + 4] = (col + 1) * resolution;
+        indices[(col * resolution + resolution - 1) * 6 + 5] = col * resolution + resolution - 1 + resolution;
+
+        for (int k = 0; k < 3; k++) {
+            vertices[((col * resolution + resolution - 1) * 6) * 3 + k] = vert[(col * resolution + resolution - 1) * 3 + k];
+            vertices[((col * resolution + resolution - 1) * 6 + 1) * 3 + k] = vert[(col * resolution) * 3 + k];
+            vertices[((col * resolution + resolution - 1) * 6 + 2) * 3 + k] = vert[(col * resolution + resolution - 1 + resolution) * 3 + k];
+            vertices[((col * resolution + resolution - 1) * 6 + 3) * 3 + k] = vert[(col * resolution) * 3 + k];
+            vertices[((col * resolution + resolution - 1) * 6 + 4) * 3 + k] = vert[((col + 1) * resolution) * 3 + k];
+            vertices[((col * resolution + resolution - 1) * 6 + 5) * 3 + k] = vert[(col * resolution + resolution - 1 + resolution) * 3 + k];
+
+            normals[((col * resolution + resolution - 1) * 6) * 3 + k] = nor[(col * resolution + resolution - 1) * 3 + k];
+            normals[((col * resolution + resolution - 1) * 6 + 1) * 3 + k] = nor[(col * resolution) * 3 + k];
+            normals[((col * resolution + resolution - 1) * 6 + 2) * 3 + k] = nor[(col * resolution + resolution - 1 + resolution) * 3 + k];
+            normals[((col * resolution + resolution - 1) * 6 + 3) * 3 + k] = nor[(col * resolution) * 3 + k];
+            normals[((col * resolution + resolution - 1) * 6 + 4) * 3 + k] = nor[((col + 1) * resolution) * 3 + k];
+            normals[((col * resolution + resolution - 1) * 6 + 5) * 3 + k] = nor[(col * resolution + resolution - 1 + resolution) * 3 + k];
+        }
+    }
+
+    for (int row = 0; row < resolution - 1; row++) {
+        indices[((resolution - 1) * resolution + row) * 6] = (resolution - 1) * resolution + row;
+        indices[((resolution - 1) * resolution + row) * 6 + 1] = (resolution - 1) * resolution + row + 1;
+        indices[((resolution - 1) * resolution + row) * 6 + 2] = row;
+
+        indices[((resolution - 1) * resolution + row) * 6 + 3] = (resolution - 1) * resolution + row + 1;
+        indices[((resolution - 1) * resolution + row) * 6 + 4] = row + 1;
+        indices[((resolution - 1) * resolution + row) * 6 + 5] = row;
+
+        for (int k = 0; k < 3; k++) {
+            vertices[(((resolution - 1) * resolution + row) * 6) * 3 + k] = vert[((resolution - 1) * resolution + row) * 3 + k];
+            vertices[(((resolution - 1) * resolution + row) * 6 + 1) * 3 + k] = vert[((resolution - 1) * resolution + row + 1) * 3 + k];
+            vertices[(((resolution - 1) * resolution + row) * 6 + 2) * 3 + k] = vert[row * 3 + k];
+            vertices[(((resolution - 1) * resolution + row) * 6 + 3) * 3 + k] = vert[((resolution - 1) * resolution + row + 1) * 3 + k];
+            vertices[(((resolution - 1) * resolution + row) * 6 + 4) * 3 + k] = vert[(row + 1) * 3 + k];
+            vertices[(((resolution - 1) * resolution + row) * 6 + 5) * 3 + k] = vert[(row)*3 + k];
+
+            normals[(((resolution - 1) * resolution + row) * 6) * 3 + k] = nor[((resolution - 1) * resolution + row) * 3 + k];
+            normals[(((resolution - 1) * resolution + row) * 6 + 1) * 3 + k] = nor[((resolution - 1) * resolution + row + 1) * 3 + k];
+            normals[(((resolution - 1) * resolution + row) * 6 + 2) * 3 + k] = nor[row * 3 + k];
+            normals[(((resolution - 1) * resolution + row) * 6 + 3) * 3 + k] = nor[((resolution - 1) * resolution + row + 1) * 3 + k];
+            normals[(((resolution - 1) * resolution + row) * 6 + 4) * 3 + k] = nor[(row + 1) * 3 + k];
+            normals[(((resolution - 1) * resolution + row) * 6 + 5) * 3 + k] = nor[(row)*3 + k];
+        }
+    }
+
+    for (int k = 0; k < 3; k++) {
+        vertices[((resolution * resolution - 1) * 6) * 3 + k] = vert[(resolution * resolution - 1) * 3 + k];
+        vertices[(((resolution - 1) * resolution + resolution - 1) * 6 + 1) * 3 + k] = vert[((resolution - 1) * resolution) * 3 + k];
+        vertices[(((resolution - 1) * resolution + resolution - 1) * 6 + 2) * 3 + k] = vert[(resolution - 1) * 3 + k];
+        vertices[(((resolution - 1) * resolution + resolution - 1) * 6 + 3) * 3 + k] = vert[((resolution - 1) * resolution) * 3 + k];
+        vertices[(((resolution - 1) * resolution + resolution - 1) * 6 + 4) * 3 + k] = vert[k];
+        vertices[(((resolution - 1) * resolution + resolution - 1) * 6 + 5) * 3 + k] = vert[(resolution - 1) * 3 + k];
+
+        normals[((resolution * resolution - 1) * 6) * 3 + k] = nor[(resolution * resolution - 1) * 3 + k];
+        normals[(((resolution - 1) * resolution + resolution - 1) * 6 + 1) * 3 + k] = nor[((resolution - 1) * resolution) * 3 + k];
+        normals[(((resolution - 1) * resolution + resolution - 1) * 6 + 2) * 3 + k] = nor[(resolution - 1) * 3 + k];
+        normals[(((resolution - 1) * resolution + resolution - 1) * 6 + 3) * 3 + k] = nor[((resolution - 1) * resolution) * 3 + k];
+        normals[(((resolution - 1) * resolution + resolution - 1) * 6 + 4) * 3 + k] = nor[k];
+        normals[(((resolution - 1) * resolution + resolution - 1) * 6 + 5) * 3 + k] = nor[(resolution - 1) * 3 + k];
+    }
+
+    float colors[4] = { 0.54f, 0.65f, 1.0f, 0.5f };
+
+    DrawTaskManager::addDrawTask(GL_TRIANGLES, num_indices, vertices, colors, normals);
+
+    delete[] nor;
+    nor = nullptr;
+    delete[] vert;
+    vert = nullptr;
+    delete[] vertices;
+    vertices = nullptr;
+    delete[] normals;
+    normals = nullptr;
+    delete[] indices;
+    indices = nullptr;
 }
