@@ -1,5 +1,6 @@
 #include "paraminputdialog.h"
 #include "ui_paraminputdialog.h"
+#include "mathutils.h"
 #include <QMessageBox>
 
 ParamInputDialog::ParamInputDialog(QWidget *parent) :
@@ -29,6 +30,10 @@ void ParamInputDialog::on_button_ok_clicked()
     double y = ui->lineEdit_y->text().toDouble(&ok_y);
     double z = ui->lineEdit_z->text().toDouble(&ok_z);
     double r = ui->lineEdit_r->text().toDouble(&ok_r);
+
+    if (isNonPositive(r)) {
+        ok_r = false;
+    }
 
     if (ok_x & ok_y & ok_z & ok_r) {
         Sphere sphere(x, y, z, r);

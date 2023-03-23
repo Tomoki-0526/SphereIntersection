@@ -5,8 +5,7 @@
 #include <cmath>
 
 Sphere::Sphere()
-    : _c(QVector3D(0, 0, 0))
-    , _r(0)
+    : _r(0)
 {
 }
 
