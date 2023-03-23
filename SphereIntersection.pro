@@ -9,19 +9,23 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    circle3d.cpp \
     drawtask.cpp \
     drawtaskmanager.cpp \
     glwidget.cpp \
     main.cpp \
     mainwindow.cpp \
+    mathutils.cpp \
     paraminputdialog.cpp \
     sphere.cpp
 
 HEADERS += \
+    circle3d.h \
     drawtask.h \
     drawtaskmanager.h \
     glwidget.h \
     mainwindow.h \
+    mathutils.h \
     paraminputdialog.h \
     sphere.h
 
