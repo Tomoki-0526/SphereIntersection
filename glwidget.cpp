@@ -5,6 +5,7 @@
 
 #include <QString>
 #include <QDebug>
+#include <QMatrix4x4>
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget{parent}
@@ -50,7 +51,7 @@ void GLWidget::initializeGL()
     glEnable(GL_POINT_SMOOTH);
     glPointSize(10.0f);
     glEnable(GL_LINE_SMOOTH);
-    glLineWidth(2.0f);
+    glLineWidth(4.0f);
 
     glClearColor(0.83f, 0.83f, 0.83f, 1.0f);
 
@@ -108,10 +109,6 @@ void GLWidget::paintGL()
     shader_program->setUniformValue(projection_matrix, cam_proj_mat);
     shader_program->setUniformValue(view_matrix, cam_view_mat);
 
-//    glLoadIdentity();
-//    glPushMatrix();
-//    drawSphere(4, 0, 0, 5);
-//    glPopMatrix();
     vector<DrawTask> draw_tasks = DrawTaskManager::getDrawTasks();
     for (auto& task : draw_tasks) {
         draw(task.getDrawMode(), task.getNum(), task.getVertices(), task.getColors(), task.getNormals());
@@ -203,7 +200,7 @@ void GLWidget::wheelEvent(QWheelEvent* event)
     float delta = event->angleDelta().y();
     view_size -= delta * 0.002f;
     if (view_size < 1.0f || view_size > 50.0f){
-        view_size += delta * 0.002f;
+        view_size += delta * 0.004f;
         return;
     }
     cam_proj_mat.setToIdentity();
@@ -391,7 +388,6 @@ void GLWidget::addDrawTask(Sphere sphere)
     }
 
     float colors[4] = { 0.54f, 0.65f, 1.0f, 0.5f };
-
     DrawTaskManager::addDrawTask(GL_TRIANGLES, num_indices, vertices, colors, normals);
 
     delete[] nor;
@@ -404,4 +400,44 @@ void GLWidget::addDrawTask(Sphere sphere)
     normals = nullptr;
     delete[] indices;
     indices = nullptr;
+}
+
+void GLWidget::addDrawTask(Circle3D circle)
+{
+    QVector3D center = circle.center();
+    QVector3D normal = circle.normal();
+    float radius = circle.radius();
+    float R = radius + 0.01;
+
+    QVector3D dir;
+    if (normal.y() == 0) {
+        dir = QVector3D(0, 1, 0);
+    }
+    else {
+        dir = QVector3D(1, -normal.x() / normal.y(), 0).normalized();
+    }
+
+    int resolution = 180;
+    float* vertices = new float[resolution * 3];
+    for (int i = 0; i < resolution; ++i) {
+        QMatrix4x4 rot_mat;
+        rot_mat.rotate(float(i) / resolution * 360, normal);
+        QVector3D v = rot_mat.map(dir).normalized();
+
+        vertices[i * 3] = center.x() + v.x() * R;
+        vertices[i * 3 + 1] = center.y() + v.y() * R;
+        vertices[i * 3 + 2] = center.z() + v.z() * R;
+    }
+
+    DrawTaskManager::addDrawTask(GL_LINE_LOOP, resolution, vertices);
+}
+
+void GLWidget::addDrawTask(QVector3D point)
+{
+    float* vertices = new float[3];
+    for (int i = 0; i < 3; ++i) {
+        vertices[i] = point[i];
+    }
+
+    DrawTaskManager::addDrawTask(GL_POINTS, 1, vertices);
 }

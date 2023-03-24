@@ -2,12 +2,13 @@
 #include "ui_mainwindow.h"
 #include "paraminputdialog.h"
 #include "mathutils.h"
-#include "circle3d.h"
 
 #include <windows.h>
 
 #include <QMessageBox>
 #include <QDebug>
+#include <QStringList>
+#include <QStringListModel>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,7 +18,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(this, SIGNAL(sendDataToGLWidget(Sphere)), ui->openGLWidget, SLOT(addDrawTask(Sphere)));
+    connect(this, SIGNAL(sendSphere2GLWidget(Sphere)), ui->openGLWidget, SLOT(addDrawTask(Sphere)));
+    connect(this, SIGNAL(sendCircle3D2GLWidget(Circle3D)), ui->openGLWidget, SLOT(addDrawTask(Circle3D)));
+    connect(this, SIGNAL(sendPoint2GLWidget(QVector3D)), ui->openGLWidget, SLOT(addDrawTask(QVector3D)));
 }
 
 MainWindow::~MainWindow()
@@ -33,7 +36,7 @@ void MainWindow::drawSphereByGLWidget(Sphere sphere)
     else if (!s2) {
         s2 = new Sphere(sphere);
     }
-    emit sendDataToGLWidget(sphere);
+    emit sendSphere2GLWidget(sphere);
 }
 
 void MainWindow::on_actionDrawSphere_triggered()
@@ -66,26 +69,50 @@ void MainWindow::on_actionIntersection_triggered()
         QueryPerformanceCounter(&end_time);
         double time = 0.001 * (double)(end_time.QuadPart - start_time.QuadPart) / (double)frequency.QuadPart;
 
-        qDebug() << "求交耗时(ms): " << time;
+        QStringList string_list;
+        QString time_str = QString::fromStdString("求交耗时(ms): " + to_string(time));
+        string_list.append(time_str);
+        string_list.append("---------------------------------------------------------");
+        string_list.append("求交结果");
 
         switch (type) {
         case 0: {
-            qDebug() << "两球不相交";
+            string_list.append("两球不相交");
+
+            QStringListModel* list_model = new QStringListModel(string_list);
+            ui->listView->setModel(list_model);
         } break;
         case 1: {
             QVector3D p(res[0], res[1], res[2]);
-            qDebug() << "两球交于一点";
-            qDebug() << "交点: (" << p.x() << "," << p.y() << "," << p.z() << ")";
+            emit sendPoint2GLWidget(p);
+
+            string_list.append("两球交于一点");
+            QString coordinate = QString::fromStdString("坐标: (" + to_string(p.x()) + ", " + to_string(p.y()) + ", " + to_string(p.z()) + ")");
+            string_list.append(coordinate);
+
+            QStringListModel* list_model = new QStringListModel(string_list);
+            ui->listView->setModel(list_model);
         } break;
         case 2: {
             Circle3D c(res[0], res[1], res[2], res[3], res[4], res[5], res[6]);
-            qDebug() << "两球交于一圆";
-            qDebug() << "圆心: (" << c.center().x() << "," << c.center().y() << "," << c.center().z() << ")";
-            qDebug() << "法向: (" << c.normal().x() << "," << c.normal().y() << "," << c.normal().z() << ")";
-            qDebug() << "半径: " << c.radius();
+            emit sendCircle3D2GLWidget(c);
+
+            string_list.append("两球交于一圆");
+            QString center = QString::fromStdString("圆心: (" + to_string(c.center().x()) + ", " + to_string(c.center().y()) + ", " + to_string(c.center().z()) + ")");
+            QString normal = QString::fromStdString("法向: (" + to_string(c.normal().x()) + ", " + to_string(c.normal().y()) + ", " + to_string(c.normal().z()) + ")");
+            QString radius = QString::fromStdString("半径: " + to_string(c.radius()));
+            string_list.append(center);
+            string_list.append(normal);
+            string_list.append(radius);
+
+            QStringListModel* list_model = new QStringListModel(string_list);
+            ui->listView->setModel(list_model);
         } break;
         case 3: {
-            qDebug() << "两球重合";
+            string_list.append("两球重合");
+
+            QStringListModel* list_model = new QStringListModel(string_list);
+            ui->listView->setModel(list_model);
         } break;
         }
     }

@@ -14,7 +14,7 @@ public:
 
     static vector<DrawTask>& getDrawTasks();
     static void addDrawTask(DrawTask task);
-    static void addDrawTask(GLenum draw_mode, int num, GLfloat* vertices, GLfloat* colors, GLfloat* normals);
+    static void addDrawTask(GLenum draw_mode, int num, GLfloat* vertices, GLfloat* colors = nullptr, GLfloat* normals = nullptr);
     static void removeDrawTask(int index);
 
 private:

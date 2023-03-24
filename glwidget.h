@@ -2,6 +2,7 @@
 #define GLWIDGET_H
 
 #include "sphere.h"
+#include "circle3d.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLExtraFunctions>
@@ -44,6 +45,8 @@ protected:
 
 public slots:
     void addDrawTask(Sphere sphere);
+    void addDrawTask(Circle3D circle);
+    void addDrawTask(QVector3D point);
 
 private:
     // 相机
@@ -61,8 +64,6 @@ private:
     float yaw;
     float pitch;
     QPoint last_mouse_pos;
-
-    // 光照
 
     // 着色器
     QOpenGLShaderProgram* shader_program;

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "sphere.h"
+#include "circle3d.h"
 
 #include <QMainWindow>
 
@@ -18,7 +19,9 @@ public:
     ~MainWindow();
 
 signals:
-    void sendDataToGLWidget(Sphere sphere);
+    void sendSphere2GLWidget(Sphere sphere);
+    void sendCircle3D2GLWidget(Circle3D circle);
+    void sendPoint2GLWidget(QVector3D point);
 
 public slots:
     void drawSphereByGLWidget(Sphere sphere);
