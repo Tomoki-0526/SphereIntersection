@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 
 #include "sphere.h"
+#include "mathutils.h"
 
 #include <cmath>
 
@@ -56,8 +57,8 @@ void Sphere::radius(const float r)
 
 QVector2D Sphere::getUV(const QVector3D& p)
 {
-    float u = atan2(p.y(), p.x()) + M_PI;
-    float v = asin(p.z() / _r);
+    float u = isNonNegative(p.y() - _c.y()) ? atan2f(p.y() - _c.y(), p.x() - _c.x()) : atan2f(p.y() - _c.y(), p.x() - _c.x()) + 2 * M_PI;
+    float v = asinf((p.z() - _c.z()) / _r);
 
     return QVector2D(u, v);
 }

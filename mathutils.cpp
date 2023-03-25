@@ -96,6 +96,11 @@ bool isZero(const float& a)
     return floatCmp(a, 0) == 0;
 }
 
+bool isNonNegative(const float& a)
+{
+    return floatCmp(a, 0) >= 0;
+}
+
 bool isNonPositive(const float& a)
 {
     return floatCmp(a, 0) <= 0;

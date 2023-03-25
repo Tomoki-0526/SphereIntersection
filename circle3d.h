@@ -1,6 +1,8 @@
 #ifndef CIRCLE3D_H
 #define CIRCLE3D_H
 
+#include <vector>
+
 #include <QVector3D>
 
 class Circle3D
@@ -14,6 +16,7 @@ public:
     QVector3D center() const;
     QVector3D normal() const;
     float radius() const;
+    void getGenaralEquationParams(std::vector<float>& params) const;
 
 private:
     QVector3D _c;

@@ -49,9 +49,9 @@ void GLWidget::initializeGL()
     glDisable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_POINT_SMOOTH);
-    glPointSize(10.0f);
+    glPointSize(20.0f);
     glEnable(GL_LINE_SMOOTH);
-    glLineWidth(4.0f);
+    glLineWidth(6.0f);
 
     glClearColor(0.83f, 0.83f, 0.83f, 1.0f);
 

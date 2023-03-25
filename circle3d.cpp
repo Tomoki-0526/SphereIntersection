@@ -41,3 +41,15 @@ float Circle3D::radius() const
 {
     return _r;
 }
+
+void Circle3D::getGenaralEquationParams(std::vector<float>& params) const
+{
+    float nx = _n.x(), ny = _n.y(), nz = _n.z();
+    float a = _c.x(), b = _c.y(), c = _c.z();
+    float r = _r;
+
+    params.push_back(nx - 2 * a);
+    params.push_back(ny - 2 * b);
+    params.push_back(nz - 2 * c);
+    params.push_back(a * a + b * b + c * c - r * r - a * nx - b * ny - c * nz);
+}
