@@ -1,8 +1,6 @@
 #ifndef CIRCLE3D_H
 #define CIRCLE3D_H
 
-#include <vector>
-
 #include <QVector3D>
 
 class Circle3D
@@ -16,12 +14,20 @@ public:
     QVector3D center() const;
     QVector3D normal() const;
     float radius() const;
-    void getGenaralEquationParams(std::vector<float>& params) const;
+    QVector3D localX() const;
+    QVector3D localY() const;
+    void getPlane(float& a, float& b, float& c, float& d) const;
+    QVector3D getXYZByT(const float t) const;
+
+private:
+    void getLocalCoor(QVector3D& p, QVector3D& q) const;
 
 private:
     QVector3D _c;
     QVector3D _n;
     float _r;
+    QVector3D _a;
+    QVector3D _b;
 };
 
 #endif // CIRCLE3D_H

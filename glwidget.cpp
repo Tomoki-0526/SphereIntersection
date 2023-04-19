@@ -6,6 +6,7 @@
 #include <QString>
 #include <QDebug>
 #include <QMatrix4x4>
+#include <QDir>
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget{parent}
@@ -54,6 +55,8 @@ void GLWidget::initializeGL()
     glLineWidth(6.0f);
 
     glClearColor(0.83f, 0.83f, 0.83f, 1.0f);
+
+//    qDebug() << QDir::currentPath();
 
     shader_program = new QOpenGLShaderProgram(this);
     shader_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "C:\\Users\\Tomoki\\OneDrive\\Homework\\CAD\\SphereIntersection\\shader\\v1.vert");
@@ -440,4 +443,13 @@ void GLWidget::addDrawTask(QVector3D point)
     }
 
     DrawTaskManager::addDrawTask(GL_POINTS, 1, vertices);
+}
+
+void GLWidget::removeAllDrawTask()
+{
+    while (!DrawTaskManager::empty()) {
+        DrawTaskManager::removeDrawTask(0);
+    }
+
+    update();
 }

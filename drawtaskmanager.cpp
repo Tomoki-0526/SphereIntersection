@@ -36,3 +36,13 @@ void DrawTaskManager::removeDrawTask(int index)
 
     draw_tasks.erase(begin(draw_tasks) + index);
 }
+
+size_t DrawTaskManager::size()
+{
+    return draw_tasks.size();
+}
+
+bool DrawTaskManager::empty()
+{
+    return draw_tasks.empty();
+}

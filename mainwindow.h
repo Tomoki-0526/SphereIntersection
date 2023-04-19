@@ -5,6 +5,7 @@
 #include "circle3d.h"
 
 #include <QMainWindow>
+#include <QStringListModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,6 +23,7 @@ signals:
     void sendSphere2GLWidget(Sphere sphere);
     void sendCircle3D2GLWidget(Circle3D circle);
     void sendPoint2GLWidget(QVector3D point);
+    void clear();
 
 public slots:
     void drawSphereByGLWidget(Sphere sphere);
@@ -29,11 +31,14 @@ public slots:
 private slots:
     void on_actionDrawSphere_triggered();
     void on_actionIntersection_triggered();
+    void on_actionClear_triggered();
 
 private:
     Ui::MainWindow *ui;
 
     Sphere* s1;
     Sphere* s2;
+
+    QStringListModel* list_model;
 };
 #endif // MAINWINDOW_H

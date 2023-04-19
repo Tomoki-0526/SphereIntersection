@@ -1,6 +1,8 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
+#include "circle3d.h"
+
 #include <QVector3D>
 #include <QVector2D>
 
@@ -27,8 +29,9 @@ public:
     void center(const float x, const float y, const float z);
     void radius(const float r);
 
-    // uv坐标
-    QVector2D getUV(const QVector3D& p);	// 计算球面上一点的uv坐标
+    // uv
+    QVector2D getPointUV(const QVector3D& p);                               // 计算球面上一点的uv坐标
+    void getCircleUV(const Circle3D& circ, float& k, float& γ, float& l);   // 计算球面上一圆的uv曲线参数
 };
 
 

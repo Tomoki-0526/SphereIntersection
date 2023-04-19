@@ -47,6 +47,7 @@ public slots:
     void addDrawTask(Sphere sphere);
     void addDrawTask(Circle3D circle);
     void addDrawTask(QVector3D point);
+    void removeAllDrawTask();
 
 private:
     // 相机

@@ -1,7 +1,7 @@
 #include "mathutils.h"
 #include <cmath>
 
-const float eps = 1e-7;
+const float eps = 1e-7f;
 
 int intersectSphereSphere(vector<float>& res, const Sphere* s1, const Sphere* s2)
 {
@@ -94,6 +94,16 @@ int floatCmp(const float& a, const float& b)
 bool isZero(const float& a)
 {
     return floatCmp(a, 0) == 0;
+}
+
+bool isPositive(const float& a)
+{
+    return floatCmp(a, 0) > 0;
+}
+
+bool isNegative(const float& a)
+{
+    return floatCmp(a, 0) < 0;
 }
 
 bool isNonNegative(const float& a)
