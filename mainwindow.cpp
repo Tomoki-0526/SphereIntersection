@@ -64,14 +64,10 @@ void MainWindow::on_actionIntersection_triggered()
             list_model = nullptr;
         }
 
-        vector<float> res;
-
         auto begin = std::chrono::high_resolution_clock::now();
 
+        vector<float> res;
         int type = intersectSphereSphere(res, s1, s2);
-
-        auto end = std::chrono::high_resolution_clock::now();
-        auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 
         QString c1 = QString::fromStdString("    球心: (" + to_string(s1->center().x()) + ", " + to_string(s1->center().y()) + ", " + to_string(s1->center().z()) + ")");
         QString r1 = QString::fromStdString("    半径: " + to_string(s1->radius()));
@@ -115,9 +111,9 @@ void MainWindow::on_actionIntersection_triggered()
             circ.getPlane(a, b, c, d);
             QVector3D local_x = circ.localX();
             QVector3D local_y = circ.localY();
-            float k1, γ1, l1, k2, γ2, l2;
-            s1->getCircleUV(circ, k1, γ1, l1);
-            s2->getCircleUV(circ, k2, γ2, l2);
+            float k1, γ1, d1, k2, γ2, d2;
+            bool is_vertical1 = s1->getCircleUV(circ, k1, γ1, d1);
+            bool is_vertical2 = s2->getCircleUV(circ, k2, γ2, d2);
 
             string_list.append("求交结果: 两球交于一圆");
             string_list.append("· 基准平面");
@@ -192,43 +188,67 @@ void MainWindow::on_actionIntersection_triggered()
             string_list.append(QString::fromStdString(zt));
             string_list.append("· UV参数曲线");
             string uv1 = "    球1: ";
-            if (!isZero(k1)) {
-                uv1 += to_string(k1 * s1->radius());
-            }
-            uv1 += "cos(v)sin(u";
-            if (!isZero(γ1)) {
-                if (isPositive(γ1)) {
-                    uv1 += "+";
+            if (!is_vertical1) {
+                if (!isZero(k1)) {
+                    uv1 += to_string(k1 * s1->radius());
                 }
-                uv1 += to_string(γ1);
-            }
-            uv1 += ")\n        -" + to_string(s1->radius()) + "sin(v)";
-            if (!isZero(l1 * sqrtf(1 + k1 * k1))) {
-                if (isPositive(l1 * sqrtf(1 + k1 * k1))) {
-                    uv1 += "+";
+                uv1 += "cos(v)sin(u";
+                if (!isZero(γ1)) {
+                    if (isPositive(γ1)) {
+                        uv1 += "+";
+                    }
+                    uv1 += to_string(γ1);
                 }
-                uv1 += to_string(l1 * sqrtf(1 + k1 * k1));
+                uv1 += ")\n        -" + to_string(s1->radius()) + "sin(v)";
+                if (!isZero(d1 * sqrtf(1 + k1 * k1))) {
+                    if (isPositive(d1 * sqrtf(1 + k1 * k1))) {
+                        uv1 += "+";
+                    }
+                    uv1 += to_string(d1 * sqrtf(1 + k1 * k1));
+                }
+                uv1 += "=0";
             }
-            uv1 += "=0";
+            else {
+                uv1 += to_string(s1->radius()) + "cos(v)sin(u";
+                if (!isZero(γ1)) {
+                    if (isPositive(γ1)) {
+                        uv1 += "+";
+                    }
+                    uv1 += to_string(γ1);
+                }
+                uv1 += ")\n        +" + to_string(d1) + "=0";
+            }
             string uv2 = "    球2: ";
-            if (!isZero(k2)) {
-                uv2 += to_string(k2 * s2->radius());
-            }
-            uv2 += "cos(v)sin(u";
-            if (!isZero(γ2)) {
-                if (isPositive(γ2)) {
-                    uv2 += "+";
+            if (!is_vertical2) {
+                if (!isZero(k2)) {
+                    uv2 += to_string(k2 * s2->radius());
                 }
-                uv2 += to_string(γ2);
-            }
-            uv2 += ")\n        -" + to_string(s2->radius()) + "sin(v)";
-            if (!isZero(l2 * sqrtf(1 + k2 * k2))) {
-                if (isPositive(l2 * sqrtf(1 + k2 * k2))) {
-                    uv2 += "+";
+                uv2 += "cos(v)sin(u";
+                if (!isZero(γ2)) {
+                    if (isPositive(γ2)) {
+                        uv2 += "+";
+                    }
+                    uv2 += to_string(γ2);
                 }
-                uv2 += to_string(l2 * sqrtf(1 + k2 * k2));
+                uv2 += ")\n        -" + to_string(s2->radius()) + "sin(v)";
+                if (!isZero(d2 * sqrtf(1 + k2 * k2))) {
+                    if (isPositive(d2 * sqrtf(1 + k2 * k2))) {
+                        uv2 += "+";
+                    }
+                    uv2 += to_string(d2 * sqrtf(1 + k2 * k2));
+                }
+                uv2 += "=0";
             }
-            uv2 += "=0";
+            else {
+                uv2 += to_string(s2->radius()) + "cos(v)sin(u";
+                if (!isZero(γ2)) {
+                    if (isPositive(γ2)) {
+                        uv2 += "+";
+                    }
+                    uv2 += to_string(γ2);
+                }
+                uv2 += ")\n        +" + to_string(d2) + "=0";
+            }
             string_list.append(QString::fromStdString(uv1));
             string_list.append(QString::fromStdString(uv2));
         } break;
@@ -237,6 +257,8 @@ void MainWindow::on_actionIntersection_triggered()
         } break;
         }
 
+        auto end = std::chrono::high_resolution_clock::now();
+        auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
         QString time_str = QString::fromStdString("求交耗时(ms): " + to_string(time.count() * 1e-6));
         string_list.append(time_str);
 

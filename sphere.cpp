@@ -63,13 +63,32 @@ QVector2D Sphere::getPointUV(const QVector3D& p)
     return QVector2D(u, v);
 }
 
-void Sphere::getCircleUV(const Circle3D& circ, float& k, float& γ, float& l)
+bool Sphere::getCircleUV(const Circle3D& circ, float& k, float& γ, float& d)
 {
+    bool is_vertical = false;
+    // 交线圆所在平面与赤道平面夹角正切
     QVector3D n = circ.center() - _c;
-    k = tanf(acosf(n.normalized().z()));
-    γ = atan2f(n.y(), n.x());
-    l = n.length();
-    if (floatCmp(circ.center().z(), _c.z()) < 0) {
-        l = -l;
+    if (isZero(n.z())) {
+        is_vertical = true;
     }
+    k = tanf(acosf(n.normalized().z()));
+
+    // 大圆与赤道平面交点的方位角
+    if (isZero(n.y())) {
+        γ = M_PI_2;
+    }
+    else {
+        γ = atan(-n.x() / n.y());
+        if (isNegative(γ)) {
+            γ += M_PI_2;
+        }
+    }
+
+    // 交线圆与球心的距离
+    d = n.length();
+    if (floatCmp(circ.center().z(), _c.z()) < 0) {
+        d = -d;
+    }
+
+    return is_vertical;
 }

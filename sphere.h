@@ -31,7 +31,7 @@ public:
 
     // uv
     QVector2D getPointUV(const QVector3D& p);                               // 计算球面上一点的uv坐标
-    void getCircleUV(const Circle3D& circ, float& k, float& γ, float& l);   // 计算球面上一圆的uv曲线参数
+    bool getCircleUV(const Circle3D& circ, float& k, float& γ, float& d);   // 计算球面上一圆的uv曲线参数
 };
 
 

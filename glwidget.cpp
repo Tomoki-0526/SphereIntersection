@@ -1,5 +1,6 @@
 #include "glwidget.h"
 #include "drawtaskmanager.h"
+#include "mathutils.h"
 
 #include <cmath>
 
@@ -50,17 +51,25 @@ void GLWidget::initializeGL()
     glDisable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_POINT_SMOOTH);
-    glPointSize(20.0f);
+    glPointSize(10.0f);
     glEnable(GL_LINE_SMOOTH);
     glLineWidth(6.0f);
 
     glClearColor(0.83f, 0.83f, 0.83f, 1.0f);
 
 //    qDebug() << QDir::currentPath();
+//    printf("%s\n", glGetString(GL_VERSION));
 
     shader_program = new QOpenGLShaderProgram(this);
-    shader_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "C:\\Users\\Tomoki\\OneDrive\\Homework\\CAD\\SphereIntersection\\shader\\v1.vert");
-    shader_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "C:\\Users\\Tomoki\\OneDrive\\Homework\\CAD\\SphereIntersection\\shader\\v1.frag");
+#ifdef QT_DEBUG
+    shader_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "./debug/shader/v1.vert");
+    shader_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "./debug/shader/v1.frag");
+#else
+    shader_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "./shader/v1.vert");
+    shader_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "./shader/v1.frag");
+#endif
+//    shader_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "C:\\Users\\Tomoki\\OneDrive\\Homework\\CAD\\SphereIntersection\\shader\\v1.vert");
+//    shader_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "C:\\Users\\Tomoki\\OneDrive\\Homework\\CAD\\SphereIntersection\\shader\\v1.frag");
     shader_program->link();
 
     col_attr = shader_program->uniformLocation("ColAttr");
@@ -413,7 +422,7 @@ void GLWidget::addDrawTask(Circle3D circle)
     float R = radius + 0.01;
 
     QVector3D dir;
-    if (normal.y() == 0) {
+    if (isZero(normal.y())) {
         dir = QVector3D(0, 1, 0);
     }
     else {
